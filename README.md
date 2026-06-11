@@ -3,7 +3,7 @@
 [札幌市公共施設予約情報システム](https://yoyaku.harp.lg.jp/sapporo/) の空き状況を定期監視し、
 サッカー・フットサル施設に新たな空き枠（キャンセル・受付開始・抽選受付）が出たら Discord に通知する個人用ツール。
 
-- 📄 [要件定義書](docs/要件定義書.md) / [API調査報告書](docs/調査報告_API構造と監視対象施設.md)
+- 📄 [要件定義書](docs/要件定義書.md) / [機能設計書](docs/機能設計書.md) / [環境定義書](docs/環境定義書.md) / [API調査報告書](docs/調査報告_API構造と監視対象施設.md)
 - 実行基盤: GitHub Actions（15分間隔、JST 6:00–24:00）
 - 監視対象: Tier 1（優先・15分間隔）18施設 ＋ Tier 2（60分間隔）43施設 → [config/config.yaml](config/config.yaml)
 

@@ -1,0 +1,104 @@
+# =============================================================================
+# 札幌市公共施設予約 空き状況監視 設定ファイル
+# 施設の追加・削除・tier変更・通知時間帯の変更は、このファイルの編集だけで完結する
+# =============================================================================
+
+local_government_code: "011002"   # 札幌市（自治体コード）
+date_range_days: 14               # 実行日から何日先まで監視するか
+request_interval_seconds: 2.5     # 施設間のリクエスト間隔（秒）。対象システムへの負荷配慮のため必須（短くすると一時的な500も増える）
+active_hours: "06:00-24:00"       # JST。この範囲外に起動された場合は何もせず終了する（安全弁）
+
+# 「空き」とみなすステータス（このいずれかに変化したら通知）
+#   A01=予約申込可(先着) / L01・L02=抽選申込可 / A03=電話受付 / U10=窓口受付
+#   A02（空き表示のみ・ネット申込不可）も通知したい場合はリストに追加する
+notify_statuses: [A01, L01, L02, A03, U10]
+
+# 曜日ごとの通知対象時間帯（複数区間可）。枠の時間が一部でも重なれば通知対象
+notify_windows:
+  mon: ["18:00-22:00"]
+  tue: ["18:00-22:00"]
+  wed: ["18:00-22:00"]
+  thu: ["18:00-22:00"]
+  fri: ["18:00-22:00"]
+  sat: ["00:00-24:00"]
+  sun: ["00:00-24:00"]
+
+# 利用目的カタログ（APIリクエストの組み立てに必要。基本的に変更不要）
+purposes:
+  4:  { category: "スポーツ（屋外）", name: "屋外サッカー" }
+  30: { category: "スポーツ（屋内）", name: "サロンフットボール・フットサル" }
+  48: { category: "スポーツ（屋内）", name: "室内サッカー" }
+  49: { category: "スポーツ（屋内）", name: "ミニサッカー" }
+  59: { category: "学校開放（屋外）", name: "サッカー" }
+  68: { category: "学校開放（屋内）", name: "サロンフットボール・フットサル" }
+
+# -----------------------------------------------------------------------------
+# 監視対象施設
+#   tier: 1 = 15分間隔（優先） / 2 = 60分間隔（毎時の実行時のみ）
+# -----------------------------------------------------------------------------
+facilities:
+
+  # --- Tier 1: 優先監視（15分間隔） ---
+  - { fc: "0025", name: "東雁来公園サッカー場", area: "東区", purposes: [4], tier: 1 }
+  - { fc: "0062", name: "白旗山競技場", area: "清田区", purposes: [4], tier: 1 }
+  - { fc: "0112", name: "屯田西公園", area: "北区", purposes: [4], tier: 1 }
+  - { fc: "0121", name: "モエレ沼公園", area: "東区", purposes: [4], tier: 1 }
+  - { fc: "0139", name: "豊平川緑地（白石区）", area: "白石区", purposes: [4], tier: 1 }
+  - { fc: "0150", name: "大和ハウス プレミストドーム", area: "豊平区", purposes: [4, 48], tier: 1 }
+  - { fc: "0191", name: "前田森林公園", area: "手稲区", purposes: [4], tier: 1 }
+  - { fc: "0004", name: "中島体育センター", area: "中央区", purposes: [30], tier: 1 }
+  - { fc: "0005", name: "北ガスアリーナ札幌４６", area: "中央区", purposes: [30], tier: 1 }
+  - { fc: "0010", name: "北区体育館", area: "北区", purposes: [30], tier: 1 }
+  - { fc: "0020", name: "東区体育館", area: "東区", purposes: [30], tier: 1 }
+  - { fc: "0024", name: "スポーツ交流施設", area: "東区", purposes: [30, 48, 49], tier: 1 }
+  - { fc: "0030", name: "白石区体育館", area: "白石区", purposes: [30], tier: 1 }
+  - { fc: "0040", name: "厚別区体育館", area: "厚別区", purposes: [30], tier: 1 }
+  - { fc: "0050", name: "豊平区体育館", area: "豊平区", purposes: [30], tier: 1 }
+  - { fc: "0060", name: "清田区体育館", area: "清田区", purposes: [30], tier: 1 }
+  - { fc: "0070", name: "南区体育館", area: "南区", purposes: [30], tier: 1 }
+  - { fc: "0181", name: "農試公園", area: "西区", purposes: [30, 48, 49], tier: 1 }
+
+  # --- Tier 2: 通常監視（60分間隔） ---
+  - { fc: "0080", name: "西区体育館", area: "西区", purposes: [30], tier: 2 }
+  - { fc: "0082", name: "宮の沢屋内競技場", area: "西区", purposes: [30], tier: 2 }
+  - { fc: "0090", name: "手稲区体育館", area: "手稲区", purposes: [30], tier: 2 }
+  - { fc: "4001", name: "札幌国際交流館", area: "白石区", purposes: [30], tier: 2 }
+  - { fc: "0220", name: "山鼻中学校", area: "中央区", purposes: [59], tier: 2 }
+  - { fc: "0234", name: "新川小学校", area: "北区", purposes: [59], tier: 2 }
+  - { fc: "0244", name: "北陽中学校", area: "北区", purposes: [59], tier: 2 }
+  - { fc: "0280", name: "美香保小学校", area: "東区", purposes: [59], tier: 2 }
+  - { fc: "0285", name: "明園小学校", area: "東区", purposes: [59], tier: 2 }
+  - { fc: "0292", name: "栄南小学校", area: "東区", purposes: [59], tier: 2 }
+  - { fc: "0300", name: "札幌中学校", area: "東区", purposes: [59], tier: 2 }
+  - { fc: "0339", name: "川北小学校", area: "白石区", purposes: [59], tier: 2 }
+  - { fc: "0341", name: "白石中学校", area: "白石区", purposes: [59, 68], tier: 2 }
+  - { fc: "0372", name: "上野幌中学校", area: "厚別区", purposes: [59], tier: 2 }
+  - { fc: "0374", name: "厚別北中学校", area: "厚別区", purposes: [59], tier: 2 }
+  - { fc: "0407", name: "月寒中学校", area: "豊平区", purposes: [59, 68], tier: 2 }
+  - { fc: "0434", name: "北野中学校", area: "清田区", purposes: [59], tier: 2 }
+  - { fc: "0435", name: "平岡中学校", area: "清田区", purposes: [59], tier: 2 }
+  - { fc: "0437", name: "真栄中学校", area: "清田区", purposes: [59], tier: 2 }
+  - { fc: "0461", name: "真駒内桜山小学校", area: "南区", purposes: [59], tier: 2 }
+  - { fc: "0474", name: "真駒内中学校", area: "南区", purposes: [59, 68], tier: 2 }
+  - { fc: "0501", name: "八軒北小学校", area: "西区", purposes: [59], tier: 2 }
+  - { fc: "0505", name: "手稲東中学校", area: "西区", purposes: [59, 68], tier: 2 }
+  - { fc: "0520", name: "手稲中央小学校", area: "手稲区", purposes: [59], tier: 2 }
+  - { fc: "0530", name: "稲積中学校", area: "手稲区", purposes: [59], tier: 2 }
+  - { fc: "0534", name: "新陵中学校", area: "手稲区", purposes: [59, 68], tier: 2 }
+  - { fc: "0218", name: "伏見中学校", area: "中央区", purposes: [68], tier: 2 }
+  - { fc: "0219", name: "宮の森中学校", area: "中央区", purposes: [68], tier: 2 }
+  - { fc: "0232", name: "新琴似小学校", area: "北区", purposes: [68], tier: 2 }
+  - { fc: "0240", name: "新琴似緑小学校", area: "北区", purposes: [68], tier: 2 }
+  - { fc: "0302", name: "明園中学校", area: "東区", purposes: [68], tier: 2 }
+  - { fc: "0336", name: "北都小学校", area: "白石区", purposes: [68], tier: 2 }
+  - { fc: "0347", name: "米里中学校", area: "白石区", purposes: [68], tier: 2 }
+  - { fc: "0393", name: "月寒小学校", area: "豊平区", purposes: [68], tier: 2 }
+  - { fc: "0406", name: "八条中学校", area: "豊平区", purposes: [68], tier: 2 }
+  - { fc: "0408", name: "平岸中学校", area: "豊平区", purposes: [68], tier: 2 }
+  - { fc: "0409", name: "陵陽中学校", area: "豊平区", purposes: [68], tier: 2 }
+  - { fc: "0472", name: "簾舞中学校", area: "南区", purposes: [68], tier: 2 }
+  - { fc: "0477", name: "藤野中学校", area: "南区", purposes: [68], tier: 2 }
+  - { fc: "0490", name: "琴似小学校", area: "西区", purposes: [68], tier: 2 }
+  - { fc: "0493", name: "手稲宮丘小学校", area: "西区", purposes: [68], tier: 2 }
+  - { fc: "0522", name: "手稲山口小学校", area: "手稲区", purposes: [68], tier: 2 }
+  - { fc: "0531", name: "前田北中学校", area: "手稲区", purposes: [68], tier: 2 }

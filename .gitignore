@@ -1,0 +1,7 @@
+# 調査時の生データ（サイトのHTML/JSダンプ等）は公開リポジトリに含めない
+research/
+
+__pycache__/
+*.pyc
+.venv/
+venv/

@@ -204,11 +204,64 @@ def diff_new_availability(prev_slots, curr_slots, notify_statuses):
     return out
 
 
+def annotate_consecutive(curr_slots, hits, notify_statuses, min_minutes):
+    """連続予約可能時間が min_minutes 以上の塊に属する枠だけ残す（要件F-8）。
+
+    同一コート・同一日の空きステータス枠を開始時刻順に連結し（前枠の終了＝次枠の開始）、
+    新たに空いた枠（hits）がその塊に含まれ、塊の合計が min_minutes 以上なら通知対象。
+    塊の範囲は info["block"] に付与する（通知文言用）。
+    """
+    if min_minutes <= 0 or not hits:
+        return hits
+
+    # コート×日付ごとに空き枠を集める（キー: fc|室場|コート|日付）
+    groups = {}
+    for key, info in curr_slots.items():
+        if info["status"] in notify_statuses:
+            g = "|".join(key.split("|")[:4])
+            groups.setdefault(g, []).append(info)
+
+    # 各グループ内で時間的に連続する塊（run）を構築
+    runs_by_group = {}
+    for g, infos in groups.items():
+        runs, cur = [], None
+        for info in sorted(infos, key=lambda x: parse_hhmm(x["start"][:5])):
+            s = parse_hhmm(info["start"][:5])
+            e = parse_hhmm(info["end"][:5])
+            if e <= s:  # 日跨ぎ枠（深夜枠等）
+                e += 24 * 60
+            if cur and s == cur["end_min"]:
+                cur["end_min"] = e
+                cur["end"] = info["end"]
+            else:
+                if cur:
+                    runs.append(cur)
+                cur = {"start_min": s, "end_min": e,
+                       "start": info["start"], "end": info["end"]}
+        if cur:
+            runs.append(cur)
+        runs_by_group[g] = runs
+
+    out = []
+    for key, info in hits:
+        g = "|".join(key.split("|")[:4])
+        s = parse_hhmm(info["start"][:5])
+        run = next((r for r in runs_by_group.get(g, [])
+                    if r["start_min"] <= s < r["end_min"]), None)
+        if run and (run["end_min"] - run["start_min"]) >= min_minutes:
+            info["block"] = (run["start"], run["end"])
+            out.append((key, info))
+    return out
+
+
 def format_item_line(info):
     d = datetime.strptime(info["date"], "%Y-%m-%d")
     wd = WEEKDAY_JP[d.weekday()]
     label = STATUS_LABELS.get(info["status"], info["status"])
     place = " ".join(x for x in [info["room"], info["court"]] if x)
+    block = info.get("block")
+    if block and (block[0] != info["start"] or block[1] != info["end"]):
+        label += f"／連続枠 {block[0][:5]}–{block[1][:5]}"
     return f"{d.month}/{d.day}（{wd}） {info['start'][:5]}–{info['end'][:5]} {place}（{label}）"
 
 
@@ -361,6 +414,7 @@ def main():
     purposes_cfg = cfg["purposes"]
     notify_statuses = set(cfg["notify_statuses"])
     windows = cfg["notify_windows"]
+    min_consec = int(cfg.get("min_consecutive_minutes", 0))
     interval = float(cfg.get("request_interval_seconds", 1.5))
     start_date = now.date()
     end_date = start_date + timedelta(days=int(cfg["date_range_days"]))
@@ -396,6 +450,7 @@ def main():
         new_av = diff_new_availability(prev_slots, slots, notify_statuses)
         hit = [(k, v) for k, v in new_av
                if slot_in_windows(windows, v["date"], v["start"], v["end"])]
+        hit = annotate_consecutive(slots, hit, notify_statuses, min_consec)
         if hit:
             key = (fac["fc"], fac["name"], fac["area"])
             notify_items.setdefault(key, []).extend(hit)

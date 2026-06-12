@@ -161,14 +161,29 @@ def extract_slots(fc, data):
     """GetDayレスポンス → {キー: 枠情報} に展開
 
     キー: fc|室場コード|コートコード|日付|時間枠ID
+
+    時間枠には通常枠（usageTimeFrames）のほかに、複数の時間帯をまとめて
+    1件として予約する結合枠（joinUsageTimeFrames。例: 午前+午後通し）がある。
+    結合枠の時刻は構成枠の min(開始)〜max(終了) で解決し、is_join=True を付ける。
+    どこにも定義がない枠は resolved=False とし、通知対象から除外する
+    （00:00-00:00 のまま通知・終日扱いでフィルタを素通りするのを防ぐ）。
     """
     tf = {}
+    joins = {}
     for ts in data.get("timeFrames") or []:
         for f in ts.get("usageTimeFrames") or []:
             tf[f["usageTimeFrameId"]] = (
                 (f.get("usageStartTime") or "00:00:00"),
                 (f.get("usageEndTime") or "00:00:00"),
             )
+        for f in ts.get("joinUsageTimeFrames") or []:
+            joins[f["usageTimeFrameId"]] = f.get("joinUsageTimeFrameIds") or []
+    for fid, parts in joins.items():
+        times = [tf[p] for p in parts if p in tf]
+        if times and fid not in tf:
+            # HH:MM:SS の固定長文字列なので辞書順比較で時刻比較になる
+            tf[fid] = (min(t[0] for t in times), max(t[1] for t in times))
+
     slots = {}
     for room in data.get("rooms") or []:
         for court in room.get("courts") or []:
@@ -176,6 +191,7 @@ def extract_slots(fc, data):
                 date = (day.get("usageDate") or "")[:10]
                 for ut in day.get("usageTimes") or []:
                     fid = ut.get("usageTimeFrameId")
+                    resolved = fid in tf
                     start, end = tf.get(fid, ("00:00:00", "00:00:00"))
                     key = f"{fc}|{room['roomCode']}|{court['courtCode']}|{date}|{fid}"
                     slots[key] = {
@@ -185,8 +201,20 @@ def extract_slots(fc, data):
                         "end": end,
                         "room": room.get("roomName") or "",
                         "court": court.get("courtName") or "",
+                        "is_join": fid in joins,
+                        "resolved": resolved,
                     }
     return slots
+
+
+def is_notifiable_slot(info):
+    """通知候補にしてよい枠か。
+
+    - 時刻未解決の枠は除外（誤った終日扱いを防ぐ）
+    - 結合枠は除外。結合枠が空く時は構成枠（通常枠）も同時に空くため通知が
+      重複するだけで、通常枠側で過不足なく通知できる
+    """
+    return info.get("resolved", True) and not info.get("is_join", False)
 
 
 def diff_new_availability(prev_slots, curr_slots, notify_statuses):
@@ -215,9 +243,10 @@ def annotate_consecutive(curr_slots, hits, notify_statuses, min_minutes):
         return hits
 
     # コート×日付ごとに空き枠を集める（キー: fc|室場|コート|日付）
+    # 結合枠・未解決枠は連結計算を壊すため除外（通常枠のみで連続性を判定）
     groups = {}
     for key, info in curr_slots.items():
-        if info["status"] in notify_statuses:
+        if info["status"] in notify_statuses and is_notifiable_slot(info):
             g = "|".join(key.split("|")[:4])
             groups.setdefault(g, []).append(info)
 
@@ -438,6 +467,9 @@ def main():
         try:
             data = fetch_day(lgc, fac["fc"], payload)
             slots = extract_slots(fac["fc"], data)
+            unresolved = sum(1 for v in slots.values() if not v.get("resolved", True))
+            if unresolved:
+                log(f"WARN {fac['name']}: 時刻を解決できない枠が{unresolved}件（通知対象外として扱う）")
             fetched_slots.update(slots)
             fetched_fcs.add(fac["fc"])
             ok += 1
@@ -449,7 +481,8 @@ def main():
 
         new_av = diff_new_availability(prev_slots, slots, notify_statuses)
         hit = [(k, v) for k, v in new_av
-               if slot_in_windows(windows, v["date"], v["start"], v["end"])]
+               if is_notifiable_slot(v)
+               and slot_in_windows(windows, v["date"], v["start"], v["end"])]
         hit = annotate_consecutive(slots, hit, notify_statuses, min_consec)
         if hit:
             key = (fac["fc"], fac["name"], fac["area"])

@@ -82,13 +82,16 @@ X-Requested-With: XMLHttpRequest
     ]}
   ],
   timeFrames: [                  // 時間枠ID → 実時刻の対応表（同梱）
-    { usageTimeFrames: [ { usageTimeFrameId, usageStartTime, usageEndTime, usageTimeName } ] }
+    { usageTimeFrames: [ { usageTimeFrameId, usageStartTime, usageEndTime, usageTimeName } ],
+      joinUsageTimeFrames: [ { usageTimeFrameId, joinUsageTimeFrameIds: [構成枠ID…] } ] }
   ],
   holidays: [...]
 }
 ```
 
 実測例：東雁来公園サッカー場は1時間刻み（05:00〜23:00）、山鼻中学校ナイターグラウンドは「18:00-21:00」「19:00-21:00」など日により異なる夜間枠。**時間枠の粒度は施設ごとに異なるが、必ず開始・終了時刻が取れる**ため、要件の「曜日ごとの時間帯フィルタ」はこの実時刻との重なり判定で実装できる。
+
+**結合枠（2026-06-12 追記）**：一部施設（実例: スポーツ交流施設）では、複数の時間帯をまとめて1件で予約する**結合枠**が `joinUsageTimeFrames` として定義され、dayBooks 内に通常枠と並んで独立したステータスを持つ行として現れる（例: 午前9:00-12:00＋午後13:00-17:00 → 結合枠9:00-17:00）。結合枠自体の開始・終了時刻はレスポンスに直接含まれず、`joinUsageTimeFrameIds` が指す構成枠から解決する必要がある。
 
 ### 監視判定（空きステータス）
 

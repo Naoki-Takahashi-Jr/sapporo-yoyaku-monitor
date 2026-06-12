@@ -75,6 +75,8 @@ python src/monitor.py --tier 1 --dry-run    # Tier 1 全件
 
 ## 運用上の注意
 
+- 15分間隔の起動は **cron-job.org（外部cron）からの workflow_dispatch** が主経路。GitHub の schedule はバックアップ（GitHub 側の都合で大幅に間引かれることがあるため）。起動用トークンの期限切れ等で失敗が続くと cron-job.org からメール通知が届く（詳細は [環境定義書](docs/環境定義書.md)）
+
 - 対象は公共システムのため、リクエスト間隔（`request_interval_seconds`）を詰めない・施設を無闇に増やさないこと
 - 深夜帯（JST 0:00–6:00）は監視しない設計（cron と `active_hours` の両方で制御）
 - 取得が3回連続で失敗すると 🔴 エラー通知が届く。サイトのメンテナンス・仕様変更・WAF ブロックの可能性があるので Actions ログを確認する

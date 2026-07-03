@@ -302,9 +302,13 @@ def build_notification_embeds(groups, lgc):
     fields = []
     for fac, items in groups:
         items.sort(key=lambda x: (x[1]["date"], x[1]["start"], x[1]["room"]))
-        url = f"{BASE_URL}/sapporo/FacilityAvailability/Index/{lgc}/{fac['fc']}?u={fac['purposes'][0]}"
-        lines = [format_item_line(info) for _, info in items]
-        lines.append(f"[→ 空き状況を開く]({url})")
+        # ptn=2&d=YYYY-MM-DD で空き状況ページの初期表示日付を指定できる
+        # （日付なしだと当日表示になるため、行ごとに該当日付へのリンクを付ける）
+        base_url = f"{BASE_URL}/sapporo/FacilityAvailability/Index/{lgc}/{fac['fc']}?u={fac['purposes'][0]}"
+        lines = [
+            f"{format_item_line(info)} [→開く]({base_url}&ptn=2&d={info['date']})"
+            for _, info in items
+        ]
         value, count = "", 0
         name = f"{fac['name']}（{fac['area']}）"
         for line in lines:

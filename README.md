@@ -4,13 +4,13 @@
 サッカー・フットサル施設に新たな空き枠（キャンセル・受付開始・抽選受付）が出たら Discord に通知する個人用ツール。
 
 - 📄 [概要（軽い説明）](docs/概要.md) / [監視対象施設 優先度一覧](docs/監視対象施設_優先度一覧.md) / [要件定義書](docs/要件定義書.md) / [機能設計書](docs/機能設計書.md) / [環境定義書](docs/環境定義書.md) / [API調査報告書](docs/調査報告_API構造と監視対象施設.md)
-- 実行基盤: GitHub Actions（15分間隔、JST 6:00–24:00）
-- 監視対象: Tier 1（優先・15分間隔）18施設 ＋ Tier 2（60分間隔）43施設 → [config/config.yaml](config/config.yaml)
+- 実行基盤: GitHub Actions（10分間隔で起動、JST 6:00–24:00）
+- 監視対象: Tier 1（優先・10分間隔）18施設 ＋ Tier 2（60分間隔）43施設 → [config/config.yaml](config/config.yaml)
 
 ## 仕組み
 
 ```
-GitHub Actions (cron 15分)
+GitHub Actions (10分ごとに起動)
   → GetDay API で施設ごとの空き状況を取得（14日先まで・時間枠単位）
   → 前回スナップショット (state/snapshot.json) と比較
   → 「申込不可 → 申込可」に変化した枠を抽出
@@ -66,7 +66,7 @@ python src/monitor.py --tier 1 --dry-run    # Tier 1 全件
 
 | 設定 | 内容 |
 |---|---|
-| `facilities` | 監視施設の追加・削除、`tier: 1`（15分間隔）/`tier: 2`（60分間隔）の入れ替え |
+| `facilities` | 監視施設の追加・削除、`tier: 1`（10分間隔）/`tier: 2`（60分間隔）の入れ替え |
 | `notify_windows` | 曜日ごとの通知対象時間帯（複数区間可）。初期値: 平日18–22時、土日終日 |
 | `notify_statuses` | 「空き」とみなすステータス。`A02`（空き表示のみ）を足すことも可能 |
 | `date_range_days` | 何日先まで監視するか（初期値14） |
@@ -75,7 +75,7 @@ python src/monitor.py --tier 1 --dry-run    # Tier 1 全件
 
 ## 運用上の注意
 
-- 15分間隔の起動は **cron-job.org（外部cron）からの workflow_dispatch** が主経路。GitHub の schedule はバックアップ（GitHub 側の都合で大幅に間引かれることがあるため）。起動用トークンの期限切れ等で失敗が続くと cron-job.org からメール通知が届く（詳細は [環境定義書](docs/環境定義書.md)）
+- 10分間隔の起動は **cron-job.org（外部cron）からの workflow_dispatch** が主経路。GitHub の schedule はバックアップ（GitHub 側の都合で大幅に間引かれることがあるため）。起動用トークンの期限切れ等で失敗が続くと cron-job.org からメール通知が届く（詳細は [環境定義書](docs/環境定義書.md)）
 
 - 対象は公共システムのため、リクエスト間隔（`request_interval_seconds`）を詰めない・施設を無闇に増やさないこと
 - 深夜帯（JST 0:00–6:00）は監視しない設計（cron と `active_hours` の両方で制御）

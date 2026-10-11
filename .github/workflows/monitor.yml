@@ -24,6 +24,11 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
+        with:
+          # ref を省略すると「起動した時点のコミット」に固定される。concurrency で前の実行の
+          # 完了を待った後発の実行が古い state/snapshot.json で動き、保存時に衝突して失敗するため、
+          # ジョブ開始時点のブランチ最新を取得する。
+          ref: ${{ github.ref_name }}
 
       - uses: actions/setup-python@v6
         with:

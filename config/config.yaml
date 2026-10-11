@@ -43,13 +43,7 @@ purposes:
 facilities:
 
   # --- Tier 1: 優先監視（10分間隔） ---
-  - { fc: "0025", name: "東雁来公園サッカー場", area: "東区", purposes: [4], tier: 1 }
-  - { fc: "0062", name: "白旗山競技場", area: "清田区", purposes: [4], tier: 1 }
-  - { fc: "0112", name: "屯田西公園", area: "北区", purposes: [4], tier: 1 }
-  - { fc: "0121", name: "モエレ沼公園", area: "東区", purposes: [4], tier: 1 }
-  - { fc: "0139", name: "豊平川緑地（白石区）", area: "白石区", purposes: [4], tier: 1 }
-  - { fc: "0150", name: "大和ハウス プレミストドーム", area: "豊平区", purposes: [4, 48], tier: 1 }
-  - { fc: "0191", name: "前田森林公園", area: "手稲区", purposes: [4], tier: 1 }
+  # 屋内（体育館など）
   - { fc: "0004", name: "中島体育センター", area: "中央区", purposes: [30], tier: 1 }
   - { fc: "0005", name: "北ガスアリーナ札幌４６", area: "中央区", purposes: [30], tier: 1 }
   - { fc: "0010", name: "北区体育館", area: "北区", purposes: [30], tier: 1 }
@@ -62,11 +56,38 @@ facilities:
   - { fc: "0070", name: "南区体育館", area: "南区", purposes: [30], tier: 1 }
   - { fc: "0181", name: "農試公園", area: "西区", purposes: [30, 48, 49], tier: 1 }
 
+  # 学校開放の体育館（中央区・北区・東区・白石区・豊平区の小学校・中学校）
+  - { fc: "0218", name: "伏見中学校", area: "中央区", purposes: [68], tier: 1 }
+  - { fc: "0219", name: "宮の森中学校", area: "中央区", purposes: [68], tier: 1 }
+  - { fc: "0232", name: "新琴似小学校", area: "北区", purposes: [68], tier: 1 }
+  - { fc: "0240", name: "新琴似緑小学校", area: "北区", purposes: [68], tier: 1 }
+  - { fc: "0302", name: "明園中学校", area: "東区", purposes: [68], tier: 1 }
+  - { fc: "0336", name: "北都小学校", area: "白石区", purposes: [68], tier: 1 }
+  - { fc: "0341", name: "白石中学校", area: "白石区", purposes: [59, 68], tier: 1 }
+  - { fc: "0347", name: "米里中学校", area: "白石区", purposes: [68], tier: 1 }
+  - { fc: "0393", name: "月寒小学校", area: "豊平区", purposes: [68], tier: 1 }
+  - { fc: "0406", name: "八条中学校", area: "豊平区", purposes: [68], tier: 1 }
+  - { fc: "0407", name: "月寒中学校", area: "豊平区", purposes: [59, 68], tier: 1 }
+  - { fc: "0408", name: "平岸中学校", area: "豊平区", purposes: [68], tier: 1 }
+  - { fc: "0409", name: "陵陽中学校", area: "豊平区", purposes: [68], tier: 1 }
+
   # --- Tier 2: 通常監視（60分間隔） ---
+  # 屋外サッカー
+  - { fc: "0025", name: "東雁来公園サッカー場", area: "東区", purposes: [4], tier: 2 }
+  - { fc: "0062", name: "白旗山競技場", area: "清田区", purposes: [4], tier: 2 }
+  - { fc: "0112", name: "屯田西公園", area: "北区", purposes: [4], tier: 2 }
+  - { fc: "0121", name: "モエレ沼公園", area: "東区", purposes: [4], tier: 2 }
+  - { fc: "0139", name: "豊平川緑地（白石区）", area: "白石区", purposes: [4], tier: 2 }
+  - { fc: "0150", name: "大和ハウス プレミストドーム", area: "豊平区", purposes: [4, 48], tier: 2 }
+  - { fc: "0191", name: "前田森林公園", area: "手稲区", purposes: [4], tier: 2 }
+
+  # 一般施設
   - { fc: "0080", name: "西区体育館", area: "西区", purposes: [30], tier: 2 }
   - { fc: "0082", name: "宮の沢屋内競技場", area: "西区", purposes: [30], tier: 2 }
   - { fc: "0090", name: "手稲区体育館", area: "手稲区", purposes: [30], tier: 2 }
   - { fc: "4001", name: "札幌国際交流館", area: "白石区", purposes: [30], tier: 2 }
+
+  # 学校開放
   - { fc: "0220", name: "山鼻中学校", area: "中央区", purposes: [59], tier: 2 }
   - { fc: "0234", name: "新川小学校", area: "北区", purposes: [59], tier: 2 }
   - { fc: "0244", name: "北陽中学校", area: "北区", purposes: [59], tier: 2 }
@@ -75,34 +96,21 @@ facilities:
   - { fc: "0292", name: "栄南小学校", area: "東区", purposes: [59], tier: 2 }
   - { fc: "0300", name: "札幌中学校", area: "東区", purposes: [59], tier: 2 }
   - { fc: "0339", name: "川北小学校", area: "白石区", purposes: [59], tier: 2 }
-  - { fc: "0341", name: "白石中学校", area: "白石区", purposes: [59, 68], tier: 2 }
   - { fc: "0372", name: "上野幌中学校", area: "厚別区", purposes: [59], tier: 2 }
   - { fc: "0374", name: "厚別北中学校", area: "厚別区", purposes: [59], tier: 2 }
-  - { fc: "0407", name: "月寒中学校", area: "豊平区", purposes: [59, 68], tier: 2 }
   - { fc: "0434", name: "北野中学校", area: "清田区", purposes: [59], tier: 2 }
   - { fc: "0435", name: "平岡中学校", area: "清田区", purposes: [59], tier: 2 }
   - { fc: "0437", name: "真栄中学校", area: "清田区", purposes: [59], tier: 2 }
   - { fc: "0461", name: "真駒内桜山小学校", area: "南区", purposes: [59], tier: 2 }
-  - { fc: "0474", name: "真駒内中学校", area: "南区", purposes: [59, 68], tier: 2 }
-  - { fc: "0501", name: "八軒北小学校", area: "西区", purposes: [59], tier: 2 }
-  - { fc: "0505", name: "手稲東中学校", area: "西区", purposes: [59, 68], tier: 2 }
-  - { fc: "0520", name: "手稲中央小学校", area: "手稲区", purposes: [59], tier: 2 }
-  - { fc: "0530", name: "稲積中学校", area: "手稲区", purposes: [59], tier: 2 }
-  - { fc: "0534", name: "新陵中学校", area: "手稲区", purposes: [59, 68], tier: 2 }
-  - { fc: "0218", name: "伏見中学校", area: "中央区", purposes: [68], tier: 2 }
-  - { fc: "0219", name: "宮の森中学校", area: "中央区", purposes: [68], tier: 2 }
-  - { fc: "0232", name: "新琴似小学校", area: "北区", purposes: [68], tier: 2 }
-  - { fc: "0240", name: "新琴似緑小学校", area: "北区", purposes: [68], tier: 2 }
-  - { fc: "0302", name: "明園中学校", area: "東区", purposes: [68], tier: 2 }
-  - { fc: "0336", name: "北都小学校", area: "白石区", purposes: [68], tier: 2 }
-  - { fc: "0347", name: "米里中学校", area: "白石区", purposes: [68], tier: 2 }
-  - { fc: "0393", name: "月寒小学校", area: "豊平区", purposes: [68], tier: 2 }
-  - { fc: "0406", name: "八条中学校", area: "豊平区", purposes: [68], tier: 2 }
-  - { fc: "0408", name: "平岸中学校", area: "豊平区", purposes: [68], tier: 2 }
-  - { fc: "0409", name: "陵陽中学校", area: "豊平区", purposes: [68], tier: 2 }
   - { fc: "0472", name: "簾舞中学校", area: "南区", purposes: [68], tier: 2 }
+  - { fc: "0474", name: "真駒内中学校", area: "南区", purposes: [59, 68], tier: 2 }
   - { fc: "0477", name: "藤野中学校", area: "南区", purposes: [68], tier: 2 }
   - { fc: "0490", name: "琴似小学校", area: "西区", purposes: [68], tier: 2 }
   - { fc: "0493", name: "手稲宮丘小学校", area: "西区", purposes: [68], tier: 2 }
+  - { fc: "0501", name: "八軒北小学校", area: "西区", purposes: [59], tier: 2 }
+  - { fc: "0505", name: "手稲東中学校", area: "西区", purposes: [59, 68], tier: 2 }
+  - { fc: "0520", name: "手稲中央小学校", area: "手稲区", purposes: [59], tier: 2 }
   - { fc: "0522", name: "手稲山口小学校", area: "手稲区", purposes: [68], tier: 2 }
+  - { fc: "0530", name: "稲積中学校", area: "手稲区", purposes: [59], tier: 2 }
   - { fc: "0531", name: "前田北中学校", area: "手稲区", purposes: [68], tier: 2 }
+  - { fc: "0534", name: "新陵中学校", area: "手稲区", purposes: [59, 68], tier: 2 }

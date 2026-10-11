@@ -5,7 +5,7 @@
 
 - 📄 [概要（軽い説明）](docs/概要.md) / [監視対象施設 優先度一覧](docs/監視対象施設_優先度一覧.md) / [要件定義書](docs/要件定義書.md) / [機能設計書](docs/機能設計書.md) / [環境定義書](docs/環境定義書.md) / [API調査報告書](docs/調査報告_API構造と監視対象施設.md)
 - 実行基盤: GitHub Actions（10分間隔で起動、JST 6:00–24:00）
-- 監視対象: Tier 1（優先・10分間隔）18施設 ＋ Tier 2（60分間隔）43施設 → [config/config.yaml](config/config.yaml)
+- 監視対象: Tier 1（優先・10分間隔）24施設 ＋ Tier 2（60分間隔）37施設 → [config/config.yaml](config/config.yaml)
 
 ## 仕組み
 
